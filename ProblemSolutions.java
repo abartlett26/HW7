@@ -1,13 +1,16 @@
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *   ANNIKA BARTLETT / 002
  *
  *   This java file contains the problem solutions for the methods selectionSort,
  *   mergeSortDivisibleByKFirst, asteroidsDestroyed, and numRescueCanoes methods.
  *
  ********************************************************************/
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class ProblemSolutions {
 
@@ -33,17 +36,35 @@ public class ProblemSolutions {
     }
 
     public static void selectionSort(int[] values, boolean ascending ) {
-
         int n = values.length;
 
         for (int i = 0; i < n - 1; i++) {
+            // current max or min
+            int minMaxIndex = i;
+            for (int j = i + 1; j < n; j++) {
+                // if ascending order
+                if (ascending == true) {
+                    // if other value is smaller
+                    if (values[j] < values[minMaxIndex]) {
+                        // make newest min
+                        minMaxIndex = j;
+                    }
+                // if descending
+                } else {
+                    // if other is bigger
+                    if (values[j] > values[minMaxIndex]) {
+                        // make newest max
+                        minMaxIndex = j;
+                    }
+                }
+            }
 
-            // YOU CODE GOES HERE -- COMPLETE THE INNER LOOP OF THIS
-            // "SELECTION SORT" ALGORITHM.
-            // DO NOT FORGET TO ADD YOUR NAME / SECTION ABOVE
-
+            // remember max/min value
+            int temp = values[minMaxIndex];
+            // swapsies
+            values[minMaxIndex] = values[i];
+            values[i] = temp;
         }
-
     } // End class selectionSort
 
 
@@ -90,17 +111,49 @@ public class ProblemSolutions {
      * The merging portion of the merge sort, divisible by k first
      */
 
-    private void mergeDivisbleByKFirst(int arr[], int k, int left, int mid, int right)
-    {
-        // YOUR CODE GOES HERE, THIS METHOD IS NO MORE THAN THE STANDARD MERGE PORTION
-        // OF A MERGESORT, EXCEPT THE NUMBERS DIVISIBLE BY K MUST GO FIRST WITHIN THE
-        // SEQUENCE PER THE DISCUSSION IN THE PROLOGUE ABOVE.
-        //
-        // NOTE: YOU CAN PROGRAM THIS WITH A SPACE COMPLEXITY OF O(1) OR O(N LOG N).
-        // AGAIN, THIS IS REFERRING TO SPACE COMPLEXITY. O(1) IS IN-PLACE, O(N LOG N)
-        // ALLOCATES AUXILIARY DATA STRUCTURES (TEMPORARY ARRAYS). IT WILL BE EASIER
-        // TO CODE WITH A SPACE COMPLEXITY OF O(N LOG N), WHICH IS FINE FOR PURPOSES
-        // OF THIS PROGRAMMING EXERCISES.
+    private void mergeDivisbleByKFirst(int arr[], int k, int left, int mid, int right) {
+        int[] temp = new int[right - left + 1];
+
+        List<Integer> divisible = new ArrayList<>();
+        List<Integer> notDivisible = new ArrayList<>();
+
+        // check left side
+        for (int i = left; i <= mid; i++) {
+            if (arr[i] % k == 0) {
+                divisible.add(arr[i]);
+            } else {
+                notDivisible.add(arr[i]);
+            }
+        }
+
+        // check right side
+        for (int i = mid + 1; i <= right; i++) {
+            if (arr[i] % k == 0) {
+                divisible.add(arr[i]);
+            } else {
+                notDivisible.add(arr[i]);
+            }
+        }
+
+        // sort the non divisible numbers
+        Collections.sort(notDivisible);
+
+        int index = 0;
+        // add the divisible ones into temp first
+        for (int i = 0; i < divisible.size(); i++) {
+            temp[index] = divisible.get(i);
+            index++;
+        }
+        // add the non divisibles next
+        for (int i = 0; i < notDivisible.size(); i++) {
+            temp[index] = notDivisible.get(i);
+            index++;
+        }
+
+        // copy merged back into original
+        for (int i = 0; i < temp.length; i++) {
+            arr[left + i] = temp[i];
+        }
 
         return;
 
@@ -153,10 +206,22 @@ public class ProblemSolutions {
      */
 
     public static boolean asteroidsDestroyed(int mass, int[] asteroids) {
+        boolean planetWin = true;
+        Arrays.sort(asteroids);
+        
+        // iterate through everything
+        for (int i = 0; i < asteroids.length; i++) {
+            // if planet wins, add mass to planet
+            if (mass > asteroids[i]) {
+                mass = mass + asteroids[i];
+            // if loses, end game
+            } else {
+                planetWin = false;
+                break;
+            }
+        }
 
-        // YOUR CODE GOES HERE, CONSIDER USING ARRAYS.SORT()
-
-        return false;
+        return planetWin;
 
     }
 
@@ -191,10 +256,40 @@ public class ProblemSolutions {
      */
 
     public static int numRescueSleds(int[] people, int limit) {
+        Arrays.sort(people);
 
-        // YOUR CODE GOES HERE, CONSIDER USING ARRAYS.SORT
+        int combos = 0;
+        int index = 0;
 
-        return -1;
+        // iterate through all
+        for (int i = index; i < people.length - 1; i++) {
+            // compared to everything else
+            for (int j = index + 1; j < people.length; j++) {
+                // if weight is the limit, add to combo
+                if (people[i] == limit) {
+                    combos++;
+                    // mark as accounted for
+                    people[i] = 0;
+                    // break inner bc dont need to compare to anything else anymore
+                    break;
+                // if two people equal the limit, add
+                } else if (people[i] + people[j] == limit) {
+                    combos++;
+                    people[i] = 0;
+                    people[j] = 0;
+                    break;
+                }
+            }
+        }
+
+        // account for those who are under the limit but don't have a pair
+        for (int i = index; i < people.length; i++) {
+            if (people[i] != 0) {
+                combos++;
+            }
+        }
+
+        return combos;
 
     }
 
